@@ -16,7 +16,8 @@ public def myBook : Document := {
         Block.para [Inline.text "行间公式，启动！！！！！"],
         Block.math "\\int_0^\\infty e^{-x^2} dx = \\frac{\\sqrt{\\pi}}{2}",
         Block.para [Inline.text "接下来是一段 Lean 代码："],
-        Block.code { code := "def hello := \"world\"", box := { wide := 65.0 } }
+        Block.code { code := "def hello := \"world\"", box := { wide := 65.0 } },
+        Block.code { code := "#eval 1 + 1", box := { wide := 50.0 } }
       ]
     },
     { title := "English",
