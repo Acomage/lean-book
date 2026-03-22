@@ -1,87 +1,60 @@
-/* 1. 全局排版与字体设定 */
 :root {
-  /* 定义全局颜色变量，方便后续可能添加的护眼/暗黑模式 */
-  --bg-color: #fcfcfc;       /* 极浅的米灰色背景，比纯白更护眼 */
-  --text-color: #1a1a1a;     /* 深灰色正文，对比度柔和 */
-  --sidenote-color: #666666; /* 旁注颜色更浅，避免喧宾夺主 */
+  --bg-color: #fcfcfc;
+  --text-color: #1a1a1a;
+  --font-serif: "LMRoman", "Source Han Serif", "Noto Serif CJK SC", "Songti", "SimSun", serif;
+  --font-mono: "Maple Mono Normal NL NF CN", "JetBrains Mono Nerd Font", "JetBrains Mono", "Fira Code", "Consolas", monospace;
+  --font-sans: "Noto Sans", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Inter", sans-serif;
 }
-
 body {
   margin: 0;
   padding: 0;
   background-color: var(--bg-color);
   color: var(--text-color);
-  
-  /* 字体设置：优先使用类似 LaTeX 的衬线字体 (Serif) */
-  font-family: "Latin Modern Roman", "Computer Modern Roman", "Times New Roman", serif;
-  font-size: 18px;           /* 较大的基础字号，保护视力 */
-  line-height: 1.7;          /* 宽松的行高，极大提升大段文字的可读性 */
-  
-  /* 隐藏系统默认的滚动条，因为我们要用按键/JS控制纯净的滚动 */
-  overflow-x: hidden; 
+  font-family: var(--font-serif);
+  font-size: 18px;
+  line-height: 1.7;
+  overflow-x: hidden;
 }
-
-/* 2. 核心：三列布局 (CSS Grid) */
+h1, h2, h3 {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
 .chapter {
   display: grid;
-  
-  /* 这里是魔法所在：
-     1fr: 左列，占据剩余空间的 1 份
-     minmax(auto, 65ch): 中列，正文区域，最大宽度 65 字符 (ch单位)
-     1fr: 右列，占据剩余空间的 1 份
-  */
-  grid-template-columns: 1fr minmax(auto, 65ch) 1fr;
-  grid-column-gap: 2rem;     /* 列与列之间的间距 */
-  
-  /* 让每一章至少占满一个屏幕的高度，方便基于章节的滚动 */
+  grid-template-columns: 1fr minmax(auto, 70ch) 1fr;
+  grid-column-gap: 2rem;
   min-height: 100vh;
-  padding: 4rem 0;           /* 上下留出呼吸空间 */
+  padding: 4rem 0;
+  align-content: start;
 }
-
-/* 3. 正文定位 */
-/* 默认情况下，让 .chapter 里的所有直接子元素（标题、段落、公式、代码）都落在第 2 列（中间列） */
 .chapter > * {
   grid-column: 2;
   margin-top: 0;
-  margin-bottom: 1.5rem;     /* 段落间的合理间距 */
+  margin-bottom: 1.5rem;
 }
-
-/* 4. 旁注/引用定位预留 (Sidenotes) */
-/* 如果将来你在 Lean AST 中加入了旁注节点，赋予它 class="sidenote" */
+pre, code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+}
 .sidenote {
-  grid-column: 3;            /* 强制放到第 3 列（右侧空白处） */
-  font-size: 0.85em;         /* 字号稍微缩小 */
-  line-height: 1.5;
-  color: var(--sidenote-color);
+  grid-column: 3;
+  font-size: 0.85em;
+  color: #666666;
 }
-
-.sidenote-left {
-  grid-column: 1;            /* 如果需要，也可以放到左侧第 1 列 */
-  text-align: right;         /* 左侧文字靠右对齐更美观 */
-}
-
-/* 5. 细节优化：代码块与公式 */
-pre {
-  font-family: "Fira Code", "Courier New", monospace;
+.code-box-0 {
+  width: 65.000000ch;
+  background-color: #282c34;
+  color: #abb2bf;
   padding: 1rem;
-  border-radius: 4px;
-  overflow-x: auto;          /* 如果代码太长，允许代码块内部横向滚动 */
+  border-radius: 6px;
+  overflow-x: auto;
 }
-
-.math.display {
-  text-align: center;
-  margin: 2rem 0;            /* 独立公式上下留白更多 */
-}
-
-/* 隐藏在角落的帮助按钮 */
-.help-btn {
-  position: fixed;
-  bottom: 1rem;
-  right: 1rem;
-  opacity: 0.2;              /* 平时极其透明，不干扰注意力 */
-  transition: opacity 0.3s;
-  cursor: pointer;
-}
-.help-btn:hover {
-  opacity: 1;                /* 鼠标放上去才显示清楚 */
+.code-box-1 {
+  width: 50.000000ch;
+  background-color: #282c34;
+  color: #abb2bf;
+  padding: 1rem;
+  border-radius: 6px;
+  overflow-x: auto;
 }

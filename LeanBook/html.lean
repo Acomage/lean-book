@@ -1,21 +1,28 @@
 module
 
+public structure Theme where
+  bgColor       := "#fcfcfc"
+  textColor     := "#1a1a1a"
+  fontSerif     := "\"LMRoman\", \"Source Han Serif\", \"Noto Serif CJK SC\", \"Songti\", \"SimSun\", serif"
+  fontMono      := "\"Maple Mono Normal NL NF CN\", \"JetBrains Mono Nerd Font\", \"JetBrains Mono\", \"Fira Code\", \"Consolas\", monospace"
+  fontSans      := "\"Noto Sans\", \"-apple-system\", \"BlinkMacSystemFont\", \"Segoe UI\", \"Inter\", sans-serif"
+  contentWidth  := "65ch"
+
+-- 2. CSS 规则结构与状态
 public structure CssRule where
-  className : String
+  selector   : String
   properties : List (String × String)
 
 public structure RenderState where
-  rules : Array CssRule := #[]
+  rules  : Array CssRule
   nextId : Nat := 0
 
--- 定义我们的渲染 Monad
 public abbrev RenderM := StateM RenderState
 
--- 将收集到的 CSS 规则渲染为字符串
 public def renderCss (rules : Array CssRule) : String :=
   let renderRule (r : CssRule) :=
     let props := String.join (r.properties.map (fun (k, v) => s!"  {k}: {v};\n"))
-    s!".{r.className} \{\n{props}}\n"
+    s!"{r.selector} \{\n{props}}\n"
   String.join (rules.toList.map renderRule)
 
 
