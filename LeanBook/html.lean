@@ -6,9 +6,8 @@ public structure Theme where
   fontSerif     := "\"LMRoman\", \"Source Han Serif\", \"Noto Serif CJK SC\", \"Songti\", \"SimSun\", serif"
   fontMono      := "\"Maple Mono Normal NL NF CN\", \"JetBrains Mono Nerd Font\", \"JetBrains Mono\", \"Fira Code\", \"Consolas\", monospace"
   fontSans      := "\"Noto Sans\", \"-apple-system\", \"BlinkMacSystemFont\", \"Segoe UI\", \"Inter\", sans-serif"
-  contentWidth  := "65ch"
+  contentWidth  := "70ch"
 
--- 2. CSS 规则结构与状态
 public structure CssRule where
   selector   : String
   properties : List (String × String)
@@ -25,8 +24,6 @@ public def renderCss (rules : Array CssRule) : String :=
     s!"{r.selector} \{\n{props}}\n"
   String.join (rules.toList.map renderRule)
 
-
--- 2. HTML AST 保持不变
 public inductive Html where
   | text (s : String)
   | element (tag : String) (attrs : List (String × String)) (children : List Html)
@@ -38,4 +35,3 @@ public partial def Html.render : Html → String
     let attrStr := String.join (attrs.map (fun (k, v) => s!" {k}=\"{v}\""))
     let childStr := String.join (children.map render)
     s!"<{tag}{attrStr}>{childStr}</{tag}>"
-

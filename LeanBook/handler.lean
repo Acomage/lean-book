@@ -5,7 +5,6 @@ public import LeanBook.doc
 public class Handle (α : Type) (β : outParam Type) where
   handle : α → RenderM β
 
--- 普通 Box: 白底，正文字体由全局 body 继承，不用特殊声明
 public instance : Handle Box (Html → Html) where
   handle b := do
     let st ← get
@@ -19,7 +18,7 @@ public instance : Handle Box (Html → Html) where
     return fun childHtml => Html.element "div" [("class", cName)] [childHtml]
 
 namespace CodeBlock
--- 代码块局部重写 Box：指定黑底白字，背景和排版
+
 public scoped instance : Handle Box (Html → Html) where
   handle b := do
     let st ← get
@@ -29,8 +28,8 @@ public scoped instance : Handle Box (Html → Html) where
       selector := s!".{cName}",
       properties := [
         ("width", s!"{b.wide}ch"),
-        ("background-color", "#282c34"), -- 深色代码背景
-        ("color", "#abb2bf"),            -- 浅灰代码文本
+        ("background-color", "#282c34"),
+        ("color", "#abb2bf"),
         ("padding", "1rem"),
         ("border-radius", "6px"),
         ("overflow-x", "auto")
@@ -42,7 +41,6 @@ public scoped instance : Handle Box (Html → Html) where
 public instance : Handle CodeBlock Html where
   handle cb := do
     let boxWrapper ← Handle.handle (β := Html → Html) cb.box
-    -- `pre` 和 `code` 标签在全局配置中已经被绑定了 var(--font-mono)
     let codeHtml := Html.element "pre" [] [Html.element "code" [] [Html.text cb.code]]
     return boxWrapper codeHtml
 end CodeBlock
@@ -66,7 +64,6 @@ public instance : Handle Chapter Html where
     let blocksHtml ← ch.blocks.mapM (Handle.handle (β := Html))
     return Html.element "section" [("class", "chapter")] (titleHtml :: blocksHtml)
 
--- Document 只生成 HTML 骨架，并引入同级目录下的 style.css 和 main.js
 public instance : Handle Document Html where
   handle doc := do
     let chaptersHtml ← doc.chapters.mapM (Handle.handle (β := Html))
