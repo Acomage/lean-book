@@ -1,9 +1,8 @@
-```lean
 /-!
 # Book AST (Abstract Syntax Tree)
 
 This module defines the core data structures for representing a technical/mathematical book.
-It is designed to support rich text, math environments (theorems, proofs), figures, 
+It is designed to support rich text, math environments (theorems, proofs), figures,
 and side-column content (margin notes, remarks).
 -/
 
@@ -37,23 +36,22 @@ inductive Block where
   | diagram (svg : String) (caption : Option (List Inline)) (label : Option String)
   /-- Mathematical environments like Theorem, Proof, Definition -/
   | env (type : EnvType) (title : Option (List Inline)) (label : Option String) (blocks : List Block)
-  /-- Explicit margin notes to be placed in the left/right blank columns -/
+  /-- Explicit margin notes to be placed in the right blank column -/
   | marginNote (blocks : List Block)
   deriving Repr, Inhabited
 
-/-- A chapter is the top-level division of the book. 
-    Since we want to generate separate HTML pages per chapter,
-    it explicitly contains its blocks. -/
+/-- A chapter is the top-level division of the book.
+    Since we generate a separate HTML page per chapter,
+    it explicitly carries its own blocks. -/
 structure Chapter where
-  title : List Inline
-  label : Option String
+  title  : List Inline
+  label  : Option String := none
   blocks : List Block
   deriving Repr, Inhabited
 
 /-- The entire document/book. -/
 structure Document where
-  title : List Inline
-  author : String
+  title    : List Inline
+  author   : String := ""
   chapters : List Chapter
   deriving Repr, Inhabited
-```

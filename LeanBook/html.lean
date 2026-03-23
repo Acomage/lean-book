@@ -13,8 +13,14 @@ public structure CssRule where
   properties : List (String × String)
 
 public structure RenderState where
-  rules  : Array CssRule
-  nextId : Nat := 0
+  rules       : Array CssRule
+  nextId      : Nat := 0
+  -- Per-document counters (reset per chapter where appropriate)
+  chapterNum  : Nat := 0
+  sectionNum  : Nat := 0
+  equationNum : Nat := 0
+  figureNum   : Nat := 0
+  theoremNum  : Nat := 0
 
 public abbrev RenderM := StateM RenderState
 
