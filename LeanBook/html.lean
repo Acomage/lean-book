@@ -21,6 +21,8 @@ public structure RenderState where
   equationNum : Nat := 0
   figureNum   : Nat := 0
   theoremNum  : Nat := 0
+  -- Cross-reference registry: label → (fileUrl#anchor, displayText)
+  labels      : List (String × (String × String)) := []
 
 public abbrev RenderM := StateM RenderState
 
