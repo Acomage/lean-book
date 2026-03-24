@@ -12,7 +12,7 @@ public def main : IO Unit := do
 
   -- Render chapters sequentially, threading the CSS-accumulation state
   let mut state := initialState
-  for (i, ch) in myBook.chapters.enum do
+  for (ch, i) in myBook.chapters.zipIdx do
     let chNum := i + 1
     let (pageHtml, newState) :=
       (renderChapterPage docTitleStr chNum total ch).run state

@@ -43,7 +43,7 @@ def envIsNumbered : EnvType → Bool
   | _       => true
 
 /-- Extract plain text from a list of inlines (for HTML title attributes). -/
-def inlinesToPlainText : List Inline → String
+public def inlinesToPlainText : List Inline → String
   | []                   => ""
   | (.text s)   :: rest  => s ++ inlinesToPlainText rest
   | (.emph cs)  :: rest  => inlinesToPlainText cs ++ inlinesToPlainText rest
@@ -59,7 +59,7 @@ def inlinesToPlainText : List Inline → String
 -- ---------------------------------------------------------------------------
 
 /-- Render an Inline element to Html. -/
-partial def renderInline : Inline → RenderM Html
+public partial def renderInline : Inline → RenderM Html
   | .text s => pure (Html.text (escapeHtml s))
   | .emph content => do
       let cs ← content.mapM renderInline
@@ -85,7 +85,7 @@ partial def renderInline : Inline → RenderM Html
       return Html.element "span" [("class", "footnote")] cs
 
 /-- Render a Block element to Html. -/
-partial def renderBlock : Block → RenderM Html
+public partial def renderBlock : Block → RenderM Html
   | .para inlines => do
       let cs ← inlines.mapM renderInline
       return Html.element "p" [("class", "col-main")] cs
@@ -143,10 +143,10 @@ partial def renderBlock : Block → RenderM Html
       let capHtml ← match caption with
         | some inlines => do
             let cs ← inlines.mapM renderInline
-            return [Html.element "figcaption" []
+            pure [Html.element "figcaption" []
               (Html.element "strong" [] [Html.text numStr] ::
                Html.text ": " :: cs)]
-        | none => return []
+        | none => pure []
       let baseAttrs := [("class", "col-main figure")]
       let attrs := match label with
         | some l => ("id", l) :: baseAttrs
@@ -161,10 +161,10 @@ partial def renderBlock : Block → RenderM Html
       let capHtml ← match caption with
         | some inlines => do
             let cs ← inlines.mapM renderInline
-            return [Html.element "figcaption" []
+            pure [Html.element "figcaption" []
               (Html.element "strong" [] [Html.text numStr] ::
                Html.text ": " :: cs)]
-        | none => return []
+        | none => pure []
       let baseAttrs := [("class", "col-main diagram")]
       let attrs := match label with
         | some l => ("id", l) :: baseAttrs
@@ -176,16 +176,16 @@ partial def renderBlock : Block → RenderM Html
       let numStr ← if envIsNumbered envType then do
           modify (fun st => { st with theoremNum := st.theoremNum + 1 })
           let st ← get
-          return s!" {st.chapterNum}.{st.theoremNum}"
+          pure s!" {st.chapterNum}.{st.theoremNum}"
         else
-          return ""
+          pure ""
       -- Render optional title
       let titleHtml ← match title with
         | some ts => do
             let cs ← ts.mapM renderInline
-            return [Html.element "span" [("class", "env-title")]
+            pure [Html.element "span" [("class", "env-title")]
               (Html.text " (" :: cs ++ [Html.text ")"])]
-        | none => return []
+        | none => pure []
       -- Build header
       let headerHtml := Html.element "div" [("class", "env-header")] (
         Html.element "span" [("class", "env-type-name")]
@@ -306,7 +306,7 @@ public instance : Handle Document Html where
     let total := doc.chapters.length
     let plainDocTitle := inlinesToPlainText doc.title
     -- Render each chapter as a page section, threading state through
-    let pagesHtml ← doc.chapters.enum.mapM (fun (i, ch) =>
+    let pagesHtml ← doc.chapters.mapIdxM (fun i ch =>
       renderChapterPage plainDocTitle (i + 1) total ch)
     -- Combine into one HTML document
     let head := Html.element "head" [] [

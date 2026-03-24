@@ -1,3 +1,4 @@
+module
 /-!
 # Book AST (Abstract Syntax Tree)
 
@@ -7,13 +8,13 @@ and side-column content (margin notes, remarks).
 -/
 
 /-- Types of mathematical and technical environments. -/
-inductive EnvType where
+public inductive EnvType where
   | thm | lem | prop | cor
   | defn | exampleEnv | remark | proof
   deriving Repr, BEq
 
 /-- Inline elements flow within a paragraph or heading. -/
-inductive Inline where
+public inductive Inline where
   | text (s : String)
   | emph (content : List Inline)
   | bold (content : List Inline)
@@ -25,7 +26,7 @@ inductive Inline where
   deriving Repr, Inhabited
 
 /-- Block elements form the vertical flow of the document. -/
-inductive Block where
+public inductive Block where
   | para (inlines : List Inline)
   | heading (level : Nat) (title : List Inline) (label : Option String)
   | displayMath (tex : String) (label : Option String)
@@ -43,14 +44,14 @@ inductive Block where
 /-- A chapter is the top-level division of the book.
     Since we generate a separate HTML page per chapter,
     it explicitly carries its own blocks. -/
-structure Chapter where
+public structure Chapter where
   title  : List Inline
   label  : Option String := none
   blocks : List Block
   deriving Repr, Inhabited
 
 /-- The entire document/book. -/
-structure Document where
+public structure Document where
   title    : List Inline
   author   : String := ""
   chapters : List Chapter
