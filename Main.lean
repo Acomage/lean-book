@@ -10,8 +10,11 @@ public def main : IO Unit := do
   let total        := myBook.chapters.length
   let docTitleStr  := inlinesToPlainText myBook.title
 
-  -- Render chapters sequentially, threading the CSS-accumulation state
-  let mut state := initialState
+  -- Pass 1: collect all labels from the entire document
+  let (_, stateWithLabels) := (collectDocumentLabels myBook).run initialState
+
+  -- Pass 2: render chapters using the collected label registry
+  let mut state := stateWithLabels
   for (ch, i) in myBook.chapters.zipIdx do
     let chNum := i + 1
     let (pageHtml, newState) :=

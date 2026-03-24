@@ -240,7 +240,18 @@ public def generateGlobalCss (theme : Theme) : Array CssRule :=
         ("color",        "#555")
       ]
     },
-    -- Cross-references
+    -- Cross-references (broken – label does not exist in the document)
+    { selector := "a.xref-broken", properties := [
+        ("color",           "#cc0000"),
+        ("text-decoration", "none"),
+        ("font-style",      "italic")
+      ]
+    },
+    { selector := "a.xref-broken:hover", properties := [
+        ("text-decoration", "underline")
+      ]
+    },
+    -- Cross-references (resolved)
     { selector := "a.xref", properties := [
         ("color",           "#3a6bc4"),
         ("text-decoration", "none")
@@ -338,7 +349,8 @@ public def myBook : Document := {
         Block.displayMath "\\int_0^\\infty e^{-x^2}\\,dx = \\frac{\\sqrt{\\pi}}{2}"
           (some "eq-gaussian"),
         Block.marginNote [
-          Block.para [Inline.text "This is a margin note aligned with the display math above."]
+          Block.para [Inline.text "This Gaussian integral (", Inline.ref "eq-gaussian",
+            Inline.text ") appears throughout probability theory."]
         ],
         Block.env .thm
           (some [Inline.text "Yoneda Lemma"])
@@ -362,8 +374,17 @@ public def myBook : Document := {
         Block.codeBlock "lean"
           "def hello : String := \"Hello, world!\"\n#eval hello",
         Block.para [
-          Inline.text "For more details see ",
+          Inline.text "For the categorical background used here, see ",
           Inline.ref "ch-math",
+          Inline.text ", in particular ",
+          Inline.ref "defn-category",
+          Inline.text ".  The Gaussian integral ",
+          Inline.ref "eq-gaussian",
+          Inline.text " and ",
+          Inline.ref "thm-yoneda",
+          Inline.text " are referenced within this chapter.",
+          Inline.text "  An intentionally broken reference: ",
+          Inline.ref "no-such-label",
           Inline.text "."
         ]
       ]
@@ -372,7 +393,14 @@ public def myBook : Document := {
       label  := some "ch-math",
       blocks := [
         Block.para [
-          Inline.text "This chapter reviews the mathematical background."
+          Inline.text "This chapter reviews the mathematical background needed throughout the book.",
+          Inline.text "  The motivating example in ",
+          Inline.ref "ch-intro",
+          Inline.text " uses the Yoneda Lemma (",
+          Inline.ref "thm-yoneda",
+          Inline.text ") and the Gaussian integral (",
+          Inline.ref "eq-gaussian",
+          Inline.text ")."
         ],
         Block.env .defn
           (some [Inline.text "Category"])
@@ -382,7 +410,7 @@ public def myBook : Document := {
             Inline.emph [Inline.text "category"],
             Inline.text " consists of objects, morphisms, composition, and identity satisfying the associativity and identity laws."
           ]],
-        Block.heading 1 [Inline.text "Limits and Colimits"] none,
+        Block.heading 1 [Inline.text "Limits and Colimits"] (some "sec-limits"),
         Block.para [
           Inline.text "A ",
           Inline.emph [Inline.text "limit"],
@@ -390,22 +418,49 @@ public def myBook : Document := {
           Inline.math "D : \\mathcal{J} \\to \\mathcal{C}",
           Inline.text " is a universal cone over ",
           Inline.math "D",
-          Inline.text "."
+          Inline.text ".  See ",
+          Inline.ref "defn-category",
+          Inline.text " for the definition of a category."
         ],
         Block.marginNote [
-          Block.para [Inline.text "Limits generalise products, pullbacks, and equalisers."]
+          Block.para [Inline.text "Limits generalise products, pullbacks, and equalisers; see ",
+            Inline.ref "sec-limits", Inline.text "."]
         ],
         Block.displayMath
           "\\lim_{\\leftarrow} D \\cong \\int_{j \\in \\mathcal{J}} D(j)"
-          none,
+          (some "eq-limit"),
+        Block.para [
+          Inline.text "The end formula ",
+          Inline.ref "eq-limit",
+          Inline.text " generalises the Gaussian integral from ",
+          Inline.ref "eq-gaussian",
+          Inline.text " in the sense that both express universal constructions."
+        ],
         Block.env .remark none none [
           Block.para [Inline.text "Colimits are the dual notion, obtained by reversing all arrows."]
         ],
+        Block.env .prop
+          (some [Inline.text "Existence of Limits"])
+          (some "prop-limit-existence")
+          [Block.para [
+            Inline.text "A category ",
+            Inline.math "\\mathcal{C}",
+            Inline.text " has all small limits if and only if it has all small products and equalisers."
+          ]],
         Block.list
           [ [Block.para [Inline.text "Products are limits over the discrete diagram."]],
             [Block.para [Inline.text "Equalisers are limits over the parallel-arrows diagram."]],
             [Block.para [Inline.text "Pullbacks are limits over the cospan diagram."]] ]
-          false
+          false,
+        Block.para [
+          Inline.text "Back-reference check: this is ",
+          Inline.ref "ch-math",
+          Inline.text ", which builds on ",
+          Inline.ref "ch-intro",
+          Inline.text ".  Proposition ",
+          Inline.ref "prop-limit-existence",
+          Inline.text " will be used in the next chapter."
+        ]
       ]
     }
   ]
