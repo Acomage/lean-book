@@ -1,7 +1,7 @@
 module
-import LeanBook.doc
-import LeanBook.html
-import LeanBook.utils
+public import LeanBook.doc
+public import LeanBook.html
+public import LeanBook.utils
 
 -- ---------------------------------------------------------------------------
 -- Pass 1: Collect all cross-reference labels

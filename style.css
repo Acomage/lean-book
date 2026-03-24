@@ -179,6 +179,14 @@ blockquote.col-main {
   padding-left: 1rem;
   color: #555;
 }
+a.xref-broken {
+  color: #cc0000;
+  text-decoration: none;
+  font-style: italic;
+}
+a.xref-broken:hover {
+  text-decoration: underline;
+}
 a.xref {
   color: #3a6bc4;
   text-decoration: none;

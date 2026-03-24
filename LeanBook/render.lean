@@ -1,8 +1,8 @@
 module
-import LeanBook.doc
-import LeanBook.html
-import LeanBook.utils
-import LeanBook.pass1
+public import LeanBook.doc
+public import LeanBook.html
+public import LeanBook.utils
+public import LeanBook.pass1
 
 -- ---------------------------------------------------------------------------
 -- Typeclass for rendering a value into a target representation inside RenderM.

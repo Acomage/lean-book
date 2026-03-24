@@ -1,5 +1,5 @@
 module
-import LeanBook.doc
+public import LeanBook.doc
 
 -- ---------------------------------------------------------------------------
 -- Utility helpers
