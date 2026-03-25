@@ -19,78 +19,12 @@ public def resetChapterCounters (chNum : Nat) (st : RenderState) : RenderState :
     theoremNum  := 0
   }
 
-/-- Traverse blocks in Pass 1, mimicking the same counter increments as
-    `renderBlock` so that numbering is identical in both passes.
-    Labeled items are stored in `RenderState.labels`.
-
-    This function is `partial` because `Block` values can be arbitrarily deep:
-    `.env` contains a `List Block`, and `.list` / `.blockquote` / `.marginNote`
-    also embed nested blocks, so Lean's termination checker cannot prove
-    well-foundedness without additional annotation. -/
-public partial def collectBlockLabels (chNum : Nat) (fileUrl : String)
-    : Block → StateM RenderState Unit
-  | .heading level _title label => do
-      if level == 1 then
-        modify (fun st => { st with sectionNum := st.sectionNum + 1 })
-      match label with
-      | none   => pure ()
-      | some l => do
-          let st ← get
-          let displayText := s!"Section {chNum}.{st.sectionNum}"
-          modify (fun st => { st with
-            labels := (l, (s!"{fileUrl}#{l}", displayText)) :: st.labels })
-
-  | .displayMath _tex label => do
-      modify (fun st => { st with equationNum := st.equationNum + 1 })
-      match label with
-      | none   => pure ()
-      | some l => do
-          let st ← get
-          let displayText := s!"({chNum}.{st.equationNum})"
-          modify (fun st => { st with
-            labels := (l, (s!"{fileUrl}#{l}", displayText)) :: st.labels })
-
-  | .env envType _title label blocks => do
-      if envIsNumbered envType then
-        modify (fun st => { st with theoremNum := st.theoremNum + 1 })
-      match label with
-      | none   => pure ()
-      | some l => do
-          let st ← get
-          let displayText :=
-            if envIsNumbered envType
-              then s!"{envName envType} {chNum}.{st.theoremNum}"
-              else envName envType
-          modify (fun st => { st with
-            labels := (l, (s!"{fileUrl}#{l}", displayText)) :: st.labels })
-      blocks.forM (collectBlockLabels chNum fileUrl)
-
-  | .figure _url _caption label => do
-      modify (fun st => { st with figureNum := st.figureNum + 1 })
-      match label with
-      | none   => pure ()
-      | some l => do
-          let st ← get
-          let displayText := s!"Figure {chNum}.{st.figureNum}"
-          modify (fun st => { st with
-            labels := (l, (s!"{fileUrl}#{l}", displayText)) :: st.labels })
-
-  | .diagram _svg _caption label => do
-      modify (fun st => { st with figureNum := st.figureNum + 1 })
-      match label with
-      | none   => pure ()
-      | some l => do
-          let st ← get
-          let displayText := s!"Figure {chNum}.{st.figureNum}"
-          modify (fun st => { st with
-            labels := (l, (s!"{fileUrl}#{l}", displayText)) :: st.labels })
-
-  | .list items _ordered =>
-      items.forM (fun blks => blks.forM (collectBlockLabels chNum fileUrl))
-
-  | .blockquote blks => blks.forM (collectBlockLabels chNum fileUrl)
-  | .marginNote blks => blks.forM (collectBlockLabels chNum fileUrl)
-  | _                => pure ()
+/-- Collect cross-reference labels from a single `AnyBlock`.
+    This simply delegates to the block's own `collectLabels` method,
+    which was stored as a closure when the block was wrapped via `AnyBlock.mk`. -/
+public def collectBlockLabels (chNum : Nat) (fileUrl : String)
+    (block : AnyBlock) : StateM RenderState Unit :=
+  block.collectLabels chNum fileUrl
 
 /-- Reset per-chapter counters, register the chapter label if present,
     then collect all block labels for chapter `chNum`. -/

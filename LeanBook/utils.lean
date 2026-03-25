@@ -55,6 +55,19 @@ public def inlinesToPlainText : List Inline → String
   | (.ref l)       :: rest  => s!"[{l}]" ++ inlinesToPlainText rest
   | (.footnote cs) :: rest  => inlinesToPlainText cs ++ inlinesToPlainText rest
 
+/-- Recover the source representation of a list of inlines.
+    Used by `BlockNode.toSource` implementations for copy interception. -/
+public def inlinesToSource : List Inline → String
+  | []                      => ""
+  | (.text s)      :: rest  => s ++ inlinesToSource rest
+  | (.emph cs)     :: rest  => "*" ++ inlinesToSource cs ++ "*" ++ inlinesToSource rest
+  | (.bold cs)     :: rest  => "**" ++ inlinesToSource cs ++ "**" ++ inlinesToSource rest
+  | (.code s)      :: rest  => "`" ++ s ++ "`" ++ inlinesToSource rest
+  | (.math tex)    :: rest  => "$" ++ tex ++ "$" ++ inlinesToSource rest
+  | (.link cs url) :: rest  => "[" ++ inlinesToSource cs ++ "](" ++ url ++ ")" ++ inlinesToSource rest
+  | (.ref l)       :: rest  => s!"[{l}]" ++ inlinesToSource rest
+  | (.footnote cs) :: rest  => inlinesToSource cs ++ inlinesToSource rest
+
 /-- Prepend an `id` attribute when a label is present.
     Reduces boilerplate in renderBlock for headings, math, figures, and envs. -/
 public def addLabelAttr (label : Option String)
